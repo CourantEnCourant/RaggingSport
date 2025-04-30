@@ -10,6 +10,11 @@ from langchain_community.llms import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 import torch
 
+
+device = 'cuda' if torch.cuda.is_available() else 'mps'
+print(f'Running on {device}')
+
+
 # Step 1: Document Loading
 def load_documents(directory_path):
     """Load text documents from a directory"""
@@ -22,6 +27,7 @@ def load_documents(directory_path):
         print(f"Error loading documents: {e}")
         return []
 
+    
 # Step 2: Document Splitting
 from langchain_core.documents import Document
 
@@ -45,7 +51,7 @@ def create_vectorstore(chunks, embedding_model_name="sentence-transformers/all-M
         # Initialize the embedding model (CPU-friendly)
         embeddings = HuggingFaceEmbeddings(
             model_name=embedding_model_name,
-            model_kwargs={'device': 'mps'},
+            model_kwargs={'device': device},
             encode_kwargs={'normalize_embeddings': True}
         )
         
@@ -73,7 +79,7 @@ def load_vectorstore(path="faiss_index", embedding_model_name="sentence-transfor
         # Initialize the same embeddings used for creating the index
         embeddings = HuggingFaceEmbeddings(
             model_name=embedding_model_name,
-            model_kwargs={'device': 'mps'},
+            model_kwargs={'device': device},
             encode_kwargs={'normalize_embeddings': True}
         )
         
@@ -96,7 +102,7 @@ def load_cpu_friendly_llm(model_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0"):
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            device_map="mps",
+            device_map=device,
             torch_dtype=torch.float32,  # Use float32 on CPU
             low_cpu_mem_usage=True
         )
@@ -169,6 +175,7 @@ def add_reranking(retriever, model_name="cross-encoder/ms-marco-MiniLM-L-2-v2", 
         print(f"Error adding reranking: {e}")
         return retriever  # Return original retriever on error
 
+    
 # Step 7: Create QA Chain
 def create_qa_chain(vectorstore, llm, use_reranking=False):
     """Create a question-answering chain using LCEL syntax"""
