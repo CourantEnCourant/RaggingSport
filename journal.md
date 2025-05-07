@@ -1,3 +1,7 @@
+# 07/05/25
+* Rapport 3 pages
+* Rendu 5/23 minut
+
 # 30/04/25
 * To do:
   * Run rag and evaluation
