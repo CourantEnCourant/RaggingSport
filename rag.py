@@ -10,6 +10,8 @@ from langchain_community.llms import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 import torch
 
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+
 # Step 1: Document Loading
 def load_documents(directory_path):
     """Load text documents from a directory"""
@@ -45,7 +47,7 @@ def create_vectorstore(chunks, embedding_model_name="sentence-transformers/all-M
         # Initialize the embedding model (CPU-friendly)
         embeddings = HuggingFaceEmbeddings(
             model_name=embedding_model_name,
-            model_kwargs={'device': 'mps'},
+            model_kwargs={'device': device},
             encode_kwargs={'normalize_embeddings': True}
         )
         
@@ -73,7 +75,7 @@ def load_vectorstore(path="faiss_index", embedding_model_name="sentence-transfor
         # Initialize the same embeddings used for creating the index
         embeddings = HuggingFaceEmbeddings(
             model_name=embedding_model_name,
-            model_kwargs={'device': 'mps'},
+            model_kwargs={'device': device},
             encode_kwargs={'normalize_embeddings': True}
         )
         
@@ -96,7 +98,7 @@ def load_cpu_friendly_llm(model_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0"):
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            device_map="mps",
+            device_map=device,
             torch_dtype=torch.float32,  # Use float32 on CPU
             low_cpu_mem_usage=True
         )
@@ -257,21 +259,29 @@ def main(query, document_directory):
     qa_chain = create_qa_chain(vectorstore, llm, use_reranking)
     
     # Step 4: Run a sample query
-    print(f"\nProcessing query: {query}")
+    # print(f"\nProcessing query: {query}")
     
     result = qa_chain({"query": query})
     
-    print("\nAnswer:")
-    print(result["result"])
-    print("\nSources:")
-    for i, doc in enumerate(result["source_documents"]):
-        print(f"Source {i+1}:")
-        print(f"  From: {doc.metadata.get('source', 'Unknown')}")
-        print(f"  Content: {doc.page_content[:150]}...")
-        print()
+    # print("\nAnswer:")
+    # print(result["result"])
+    # print("\nSources:")
+    # for i, doc in enumerate(result["source_documents"]):
+    #     print(f"Source {i+1}:")
+    #     print(f"  From: {doc.metadata.get('source', 'Unknown')}")
+    #     print(f"  Content: {doc.page_content[:150]}...")
+    #     print()
 
-    with open('answer.txt', 'w') as f:
-        f.write(f"{query}\n{result['result']}")
+    # with open('answer.txt', 'w') as f:
+    #     f.write(f"{query}\n{result['result']}")
+    
+    answer = result["result"].split("Answer:")[-1].strip()
+    print(f"Final Answer: {answer}")
+    return answer
+        
+def rag(query, document_directory):
+    """Run the RAG pipeline with the given query and document directory"""
+    return main(query, document_directory)
 
 if __name__ == "__main__":
     # import argparse

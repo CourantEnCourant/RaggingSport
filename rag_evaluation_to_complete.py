@@ -9,12 +9,17 @@ from deepeval.metrics.base_metric import BaseMetric
 from deepeval.test_case import LLMTestCase
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import torch
 
-loader = TextLoader("./data/") #METTEZ VOTRE DOCUMENT
-data = loader.load()
-documents = ## TRAITEZ VOS DONNEES
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
-generator = pipeline("text2text-generation", model="google/flan-t5-small", device=-1)
+# loader = TextLoader("./data/") #METTEZ VOTRE DOCUMENT
+# data = loader.load()
+from datasets import load_dataset
+ds = load_dataset("bilgeyucel/seven-wonders", split="train")
+documents = ds['content'] ## TRAITEZ VOS DONNEES
+
+generator = pipeline("text2text-generation", model="google/flan-t5-small", device=device)
 #embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 def generate_synthetic_qa(context):
@@ -26,6 +31,10 @@ def generate_synthetic_qa(context):
 
     return question.strip(), answer.strip()
 
+import importlib
+import rag
+importlib.reload(rag)
+
 samples = []
 for doc in documents[5:6]:
     question, reference_answer = generate_synthetic_qa(doc)
@@ -33,7 +42,7 @@ for doc in documents[5:6]:
         input=question,
         context=[doc],
         expected_output=reference_answer,
-        actual_output = #METTEZ ICI LA SORTIE DE VOTRE RAG
+        actual_output = rag.rag(question,"data") #METTEZ ICI LA SORTIE DE VOTRE RAG
     ))
 
 synthetic_dataset = EvaluationDataset(test_cases=samples)
@@ -47,9 +56,15 @@ class EmbeddingSimilarityMetric(BaseMetric):
         context = " ".join(test_case.context)
         embeddings = self.model.encode([test_case.actual_output, context])
         score = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
-        test_case.metric_scores[self.name()] = float(score)
+        
         return score
+    
+    async def a_measure(self, test_case: LLMTestCase):
+        return self.measure(test_case)
 
+    def is_successful(self):
+        return self.success
+    
     def is_pass(self, score: float) -> bool:
         return score >= self.threshold
 
@@ -60,6 +75,7 @@ class EmbeddingSimilarityMetric(BaseMetric):
         return "Scores based on cosine similarity between context and generated answer"
 
 metric = EmbeddingSimilarityMetric(threshold=0.75)
-results = evaluate(dataset=synthetic_dataset, metrics=[metric])
+results = synthetic_dataset.evaluate(metrics=[metric])
 
-print("Similarity Score:", results[0].metric_scores["embedding_similarity"])
+print(results)
+# print("Similarity Score:", results[0].metric_scores["embedding_similarity"])
