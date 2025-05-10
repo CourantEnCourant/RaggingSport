@@ -1,6 +1,7 @@
 # 07/05/25
 * Rapport 3 pages
 * Rendu 5/23 minut
+* follow [this](https://www.deepeval.com/guides/guides-building-custom-metrics#building-a-custom-non-llm-eval) to use Deepeval
 
 # 30/04/25
 * To do:
