@@ -1,3 +1,11 @@
+# 14/05/25
+- Rapport tips:
+1. données
+2. méthodes
+3. évaluation
+4. problèmes
+5. amélioration
+
 # 07/05/25
 * Rapport 3 pages
 * Rendu 5/23 minut
