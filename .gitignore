@@ -173,4 +173,16 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-faiss_index/
+# Mac
+**/.DS_Store
+
+# data and output
+data/**
+output/**
+
+# Pycharm
+**/.idea
+
+# Exceptions
+!**/.gitkeep
+
