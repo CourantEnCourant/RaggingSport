@@ -177,7 +177,8 @@ cython_debug/
 **/.DS_Store
 
 # data and output
-data/**
+data/corpus/**
+data/vectorstore/**
 output/**
 
 # Pycharm
