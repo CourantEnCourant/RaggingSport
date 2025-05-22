@@ -26,7 +26,7 @@ def main(query: str,
 
     # Prepare vectorstore
     vectorstore = VectorStore()
-    if Path("../data/vectorstore").exists():
+    if Path("../data/vectorstore/index.faiss").exists():
         vectorstore.load_vectorstore("../data/vectorstore", embeddings)
     else:
         # Load documents
