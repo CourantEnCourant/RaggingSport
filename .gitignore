@@ -173,7 +173,17 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-faiss_index/
-answer.txt
-.deepeval/.deepeval_telemetry.txt
-.deepeval/.temp_test_run_data.json
+# Mac
+**/.DS_Store
+
+# data and output
+data/corpus/**
+data/vectorstore/**
+output/**
+
+# Pycharm
+**/.idea
+
+# Exceptions
+!**/.gitkeep
+
