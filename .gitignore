@@ -187,3 +187,4 @@ output/**
 # Exceptions
 !**/.gitkeep
 
+data/corpus.zip
