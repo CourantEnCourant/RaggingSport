@@ -1,9 +1,7 @@
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import OllamaLLM
 import torch
 
-from document_handler import DocumentHandler
-from vectorstore import VectorStore
+from vectorstore import prepare_vectorstore
 from qa_chain import QAChain
 
 import json
@@ -17,25 +15,9 @@ def main(query: str,
          llm_name: str,
          device: str,
          output_directory: Path):
-    # Prepare embedding model
-    embeddings = HuggingFaceEmbeddings(
-        model_name=embedding_model_name,
-        model_kwargs={'device': device},
-        encode_kwargs={'normalize_embeddings': True}
-    )
 
     # Prepare vectorstore
-    vectorstore = VectorStore()
-    if Path("../data/vectorstore").exists():
-        vectorstore.load_vectorstore("../data/vectorstore", embeddings)
-    else:
-        # Load documents
-        document_handler = DocumentHandler()
-        document_handler.load_documents(document_directory).split_documents()
-        # Create vectorstore and save
-        vectorstore.create_vectorstore(chunks=document_handler.get_documents(),
-                                       embeddings=embeddings)
-        vectorstore.save_vectorstore("../data/vectorstore")
+    vectorstore = prepare_vectorstore(embedding_model_name, document_directory, device)
 
     # Prepare LLM
     llm = OllamaLLM(
@@ -52,7 +34,7 @@ def main(query: str,
 
     # Output to json
     with open(output_directory / 'qa_chain.json', 'w') as f:
-        json.dump(response, f, indent=4)
+        json.dump(response.as_dict(), f, indent=4)
 
 
 if __name__ == '__main__':
