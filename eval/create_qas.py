@@ -16,7 +16,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--contexts_dir', type=Path, default=Path("../data/corpus"))
-    parser.add_argument('--output_dir', type=Path, default=Path("../data/qa"))
+    parser.add_argument('--output_dir', type=Path, default=Path("../data/eval"))
     args = parser.parse_args()
 
     main(contexts_dir=args.contexts_dir, output_dir=args.output_dir)

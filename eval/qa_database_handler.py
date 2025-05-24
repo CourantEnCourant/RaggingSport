@@ -18,14 +18,14 @@ class QADatabaseHandler:
         self.qas = qas
         return self
 
-    def save_qas(self, output_dir=Path("../data/qa")) -> None:
+    def save_qas(self, output_dir=Path("../data/eval")) -> None:
         if self.qas is None:
             raise self.QANotCreatedError("QAs not created yet.")
         with open(output_dir / "qas.json", "w") as f:
             qas = [qa.to_dict() for qa in self.qas]
             json.dump(qas, f)
 
-    def load_qas(self, input_path=Path("../data/qa/qas.json")) -> "QADatabaseHandler":
+    def load_qas(self, input_path=Path("../data/eval/qas.json")) -> "QADatabaseHandler":
         if not input_path.exists():
             raise FileNotFoundError(f"No such file: {input_path}")
         with open(input_path, "r") as f:

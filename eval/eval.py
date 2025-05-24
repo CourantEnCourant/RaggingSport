@@ -29,7 +29,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--metric_type', type=str, default='embedding_similarity')
-    parser.add_argument('--output_path', type=str, required=True)
+    parser.add_argument('--output_path', type=str, default=Path("../data/eval/results.json"))
     args = parser.parse_args()
 
     main(args.metric_type, args.output_path)
