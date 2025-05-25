@@ -6,6 +6,7 @@ from deepeval.metrics import (BaseMetric,
                               ContextualRelevancyMetric)
 
 from eval.custom_metrics.embedding_similarity_metric import EmbeddingSimilarityMetric
+from eval.custom_metrics.tfidf_similarity_metric import TfidfSimilarityMetric
 
 
 class MetricFactory:
@@ -42,6 +43,8 @@ class MetricFactory:
             )
         elif metric_type == "embedding_similarity":
             return EmbeddingSimilarityMetric()
+        elif metric_type == "tfidf_similarity":
+            return TfidfSimilarityMetric()
         else:
             raise self.MetricTypeNotSupportedException("Metric type not supported")
 

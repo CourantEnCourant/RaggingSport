@@ -42,6 +42,12 @@ class LLMTestCaseFactory:
                 expected_output=qa.expected_output,
                 actual_output=qa.actual_output
             )
+        elif metric_type == "tfidf_similarity":
+            return LLMTestCase(
+                input=qa.question,
+                expected_output=qa.expected_output,
+                actual_output=qa.actual_output
+            )
         else:
             raise self.MetricTypeNotSupportedException("Metric type not supported")
 
