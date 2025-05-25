@@ -1,10 +1,10 @@
-from abstract_metric import AbstractMetric
+from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-class EmbeddingSimilarityMetric(AbstractMetric):
+class EmbeddingSimilarityMetric(BaseMetric):
     def __init__(self, threshold=0.75, model_name="sentence-transformers/all-MiniLM-L6-v2"):
         self.threshold = threshold
         self.model = SentenceTransformer(model_name)
