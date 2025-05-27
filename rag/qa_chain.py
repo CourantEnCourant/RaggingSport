@@ -2,6 +2,8 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
+from rag.response import Response
+
 import logging
 
 
@@ -24,16 +26,17 @@ class QAChain:
             | StrOutputParser()
         )
 
-    def qa_with_sources(self, query_str) -> dict:
+    def qa_with_sources(self, query) -> Response:
 
-        docs = self.retriever.invoke(query_str)
+        docs = self.retriever.invoke(query)
         # Convert Document to json-serializable dict
         docs_dict = [{"page_content": doc.page_content,
                       "metadata": doc.metadata}
                      for doc in docs]
         logging.info(f"Retrieved {len(docs)} documents")
-        answer = self.qa_chain.invoke(query_str)
-        return {"query": query_str, "result": answer, "source_documents": docs_dict}
+        answer = self.qa_chain.invoke(query)
+        return Response(query, answer, docs_dict)
 
-    def format_docs(self, docs):
+    @staticmethod
+    def format_docs(docs):
         return "\n\n".join([doc.page_content for doc in docs])
